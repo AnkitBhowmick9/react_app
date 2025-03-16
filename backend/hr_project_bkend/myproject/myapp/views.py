@@ -16,7 +16,7 @@ from django.db.models import Count
 from django.db import connection
 from .google_drive import upload_to_drive  # Import the Google Drive upload function
 import os
-from django.db.models import F
+from django.db.models import F, Q
 
 logger = logging.getLogger(__name__)
 UPLOAD_DIR = os.path.join("uploads")  # Define uploads directory
@@ -109,43 +109,47 @@ def job_list(request, client_id=None, usertype=None):
     try:
         if usertype == "Employee":
             jobs = OpenJob.objects.filter(status="Open")
-        elif usertype != "Employee" and client_id:  
-            jobs = OpenJob.objects.filter(client_id=client_id)   # ✅ Use filter instead of get_object_or_404
-        
+        elif usertype != "Employee" and client_id:
+            jobs = OpenJob.objects.filter(client_id=client_id)  
+
         if jobs.exists():
             job_list = list(jobs.values("job_id", "role_title", "job_description", "client_id", "username"))
-            job_ids = [str(job["job_id"]) for job in job_list]  # Convert to string to avoid mismatches
-            logger.info(f"Fetched job IDs: {job_ids}")  # Log job IDs
+            job_ids = [str(job["job_id"]) for job in job_list]  # Ensure job_id is string
+            
+            print(f"Fetched Job IDs: {job_ids}")  
 
-            if not job_ids:  # If no job IDs found, return empty response early
+            if not job_ids:  
                 return JsonResponse([], safe=False)
 
-            # Fetch candidates who match the job IDs and client_id
+            # Fetch candidates that match job IDs
             candidates = list(
-                Candidate.objects.filter(job_id__in=job_ids, client_id=client_id).values(
-                    "job_id", "candidate_name", "cv_file_name"
-                )
+                Candidate.objects.filter(job_id__in=job_ids)  # Removed client_id filter for debugging
+                .values("job_id", "candidate_name", "cv_file_name")
             )
-            logger.info(f"Fetched candidates: {candidates}")  # Log candidate data
+            print(f"Fetched Candidates: {candidates}")  
 
-            # Convert to a dictionary mapping job_id → candidate details
-            candidate_map = {str(cand["job_id"]): cand for cand in candidates}
-            logger.info(f"Candidate Map: {candidate_map}")  # Log the candidate map
+            # Convert candidates to a job_id → candidate map
+            candidate_map = {}
+            for cand in candidates:
+                job_id_str = str(cand["job_id"])  # Ensure matching format
+                candidate_map[job_id_str] = cand
+
+            logger.info(f"Candidate Map: {candidate_map}")  
 
             # Merge candidate details into job listings
             for job in job_list:
                 job_id_str = str(job["job_id"])
-                job["candidate_name"] = candidate_map.get(job_id_str, {}).get("candidate_name", "N/A")
-                job["cv_file_name"] = candidate_map.get(job_id_str, {}).get("cv_file_name", "")
+                candidate_data = candidate_map.get(job_id_str, {})
+                job["candidate_name"] = candidate_data.get("candidate_name", "N/A")
+                job["cv_file_name"] = candidate_data.get("cv_file_name", "")
 
-            logger.info(f"Final job data: {job_list}")  # Log final job data before returning
+            logger.info(f"Final Job Data: {job_list}")  
 
-            # return JsonResponse(jobs, safe=False)
-            return JsonResponse(job_list, safe=False)  # ✅ Return list of dictionaries
+            return JsonResponse(job_list, safe=False)
         else:
             return JsonResponse({'error': 'No jobs found for this client'}, status=404)
     except Exception as e:
-        logger.error(f"Job error: {str(e)}")  # Log error details
+        logger.error(f"Job error: {str(e)}")  
         return JsonResponse({'error': 'Internal server error'}, status=500)
 
 def get_status(request, job_id):
@@ -205,18 +209,23 @@ def get_clients(request):
     clients = ClientDetails.objects.all().values("client_id", "client_name", "company_name", "email", "phone", "status")
     return JsonResponse({"clients": list(clients)}, safe=False)
 
+# @require_GET  # Ensures only GET requests are allowed
+def get_client_ids(request):
+    clients = list(ClientDetails.objects.values("client_id", "client_name"))  # Fetch required fields
+    return JsonResponse({"clients": clients}, safe=False)
+
 def get_users(request):
     users = UserLogin.objects.all().values("username", "usertype", "client_id", "company_name", "status")
     return JsonResponse({"users": list(users)}, safe=False)
 
 # Fetch Candidates
 def get_candidates(request):
-    candidates = list(Candidate.objects.filter(client_id='').values())  # Ensure it's a list
+    candidates = list(Candidate.objects.filter(Q(client_id="") | Q(client_id=None)).values())  
     return JsonResponse(candidates, safe=False)
 
-# def get_open_jobs(request):
-#     jobs = list(OpenJob.objects.filter(candidate_id=None).values())
-#     return JsonResponse(jobs, safe=False)
+def get_open_jobs(request):
+    jobs = list(OpenJob.objects.filter(candidate_id=None).values())
+    return JsonResponse(jobs, safe=False)
 
 def get_open_jobs_with_candidates(request, client_id):
     # Fetch open jobs for the given client
@@ -273,6 +282,7 @@ def register_candidate(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
+            print("Received Data:", data)
 
             required_fields = ["candidate_name", "role", "email", "phone","cv_file_name"]
             missing_fields = [field for field in required_fields if field not in data]
@@ -305,9 +315,12 @@ def register_candidate(request):
                 selection_status="Applied",  # Default status
                 cv_file_name=data["cv_file_name"],  # Default status
             )
+            print(f"candidate_id: {candidate.candidate_id, candidate.cv_file_name}")
             return JsonResponse({"success": True, "candidate_id": candidate.candidate_id})
         except Exception as e:
+            print(f"candidate_id1: {candidate.candidate_id, candidate.cv_file_name}")
             return JsonResponse({"success": False, "error": str(e)}, status=400)
+    print(f"candidate_id1: {candidate.candidate_id, candidate.cv_file_name}")
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 @csrf_exempt
@@ -317,7 +330,14 @@ def update_client_id(request, candidate_id):
             data = json.loads(request.body)
             candidate = Candidate.objects.get(candidate_id=candidate_id)
             candidate.client_id = data["client_id"]
+            candidate.job_id = data["job_id"]
             candidate.save()
+
+            job = OpenJob.objects.get(job_id=data["job_id"])
+            job.candidate_id = candidate_id
+            job.save()
+
+
             return JsonResponse({"message": "Client ID updated successfully!"}, status=200)
         except Candidate.DoesNotExist:
             return JsonResponse({"error": "Candidate not found"}, status=404)

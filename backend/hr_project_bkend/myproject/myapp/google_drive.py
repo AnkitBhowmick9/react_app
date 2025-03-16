@@ -21,12 +21,24 @@ credentials = service_account.Credentials.from_service_account_file(
 drive_service = build("drive", "v3", credentials=credentials)
 
 def upload_to_drive(file_path, file_name):
-    """Upload an Excel file to Google Drive."""
+    """Upload a file (PDF, Word, Excel) to Google Drive."""
+    
+    # Detect file type based on the extension
+    mime_types = {
+        "pdf": "application/pdf",
+        "doc": "application/msword",
+        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    }
+
+    file_extension = file_path.split(".")[-1].lower()  # Get file extension
+    mime_type = mime_types.get(file_extension, "application/octet-stream")  # Default to binary if unknown
+
     file_metadata = {
         "name": file_name,
-        "parents": [FOLDER_ID],  # Upload inside the specific folder
+        "parents": [FOLDER_ID],
     }
-    media = MediaFileUpload(file_path, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    media = MediaFileUpload(file_path, mimetype=mime_type)
 
     file = drive_service.files().create(
         body=file_metadata,

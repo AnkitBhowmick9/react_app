@@ -80,7 +80,7 @@ const RequirementPage: React.FC = () => {
                   <TableCell>{job.candidate_name || "N/A"}</TableCell>
                   <TableCell>
                     {job.cv_file_name ? (
-                      <Button variant="contained" color="primary" onClick={() => handleDownloadCV(job.cv_file_name)}>
+                      <Button variant="contained" color="primary" onClick={() => handleDownloadCV(job.job_id)}>
                         Download CV
                       </Button>
                     ) : (

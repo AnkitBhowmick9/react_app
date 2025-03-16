@@ -39,7 +39,7 @@ const CandidateForm: React.FC = () => {
     formData.append("file", file);
 
     try {
-        const response = await axios.post("http://127.0.0.1:8000/upload_cv/", formData, {
+        const response = await axios.post("http://127.0.0.1:8000/upload-cv/", formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
 
@@ -52,7 +52,7 @@ const CandidateForm: React.FC = () => {
         console.error("Error uploading CV:", error);
         return null;
     }
-};
+  };
   
 
   const handleSubmit = async (e: React.FormEvent) => {
