@@ -1,0 +1,71 @@
+/* MultiButtonPage.css */
+.multi-button-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f4f4f4;
+  padding: 20px;
+  font-family: sans-serif;
+}
+
+.header { /* Styles for the header */
+  display: flex;
+  justify-content: flex-end; /* Align logout button to the right */
+  width: 100%; /* Make header take full width */
+  margin-bottom: 20px; /* Add some space below the header */
+}
+
+
+.logout-button {
+  background-color: #dc3545; /* Red button for logout */
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #c12a36; /* Darker red on hover */
+}
+
+
+.multi-button-container h1 {
+  color: #333; /* Darker heading color */
+  margin-bottom: 20px;
+}
+
+.button-group {
+  display: flex; /* Arrange buttons horizontally */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 15px; /* Spacing between buttons */
+  justify-content: center; /* Center buttons horizontally */
+}
+
+.styled-button {
+  background-color: #007bff; /* Blue button color */
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2); /* Add a subtle shadow */
+}
+
+.styled-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Responsive Design (Example: Stack buttons vertically on smaller screens) */
+@media (max-width: 768px) {
+  .button-group {
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: center; /* Center buttons horizontally */
+  }
+}
+
+/* ... (rest of your CSS, same as before) ... */

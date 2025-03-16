@@ -1,0 +1,146 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Body Styling */
+  body {
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  /* Container Styling */
+  .container {
+    width: 90%;
+    max-width: 800px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  /* Header */
+  h1, h2 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+  }
+  
+  /* Form Styling */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  input, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  label {
+    font-weight: bold;
+    text-align: left;
+  }
+  
+  /* Buttons */
+  button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  button:hover {
+    opacity: 0.9;
+  }
+  
+  /* Primary Buttons */
+  .btn-primary {
+    background-color: #3498db;
+    color: white;
+  }
+  
+  /* Danger Buttons (Logout) */
+  .btn-danger {
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  /* Success Button */
+  .btn-success {
+    background-color: #2ecc71;
+    color: white;
+  }
+  
+  /* Table Styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  th {
+    background-color: #34495e;
+    color: white;
+  }
+  
+  td.green {
+    background-color: #2ecc71;
+    color: white;
+  }
+  
+  td.red {
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  td.gray {
+    background-color: #bdc3c7;
+    color: white;
+  }
+  
+  /* Navigation Links */
+  .nav-links {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: #3498db;
+    font-weight: bold;
+  }
+  
+  .nav-links a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .container {
+      width: 95%;
+    }
+  
+    table {
+      font-size: 14px;
+    }
+  }
+  
