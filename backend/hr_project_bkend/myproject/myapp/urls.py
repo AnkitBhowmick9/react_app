@@ -25,5 +25,5 @@ urlpatterns = [
     path("open-jobs/<str:job_id>/assign-candidate/", assign_candidate_to_job, name="assign_candidate_to_job"),
     path("upload-cv/", upload_cv, name="upload_cv"),
     path("download-cv/<str:job_id>/", download_cv, name="download_cv"),
-
+    
 ]
