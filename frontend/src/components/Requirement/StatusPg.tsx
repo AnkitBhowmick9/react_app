@@ -66,8 +66,8 @@ const StatusPage: React.FC = () => {
   // Submit updated status to backend
   const handleSubmit = async () => {
     try {
-      await axios.post(`http://127.0.0.1:8000/status/update/`, {
-        job_id: jobId,
+      await axios.post(`http://127.0.0.1:8000/status/updates/${jobId}`, {
+        // job_id: jobId,
         stage_status: statusData?.stage_status
       });
       alert("Status updated successfully!");

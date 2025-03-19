@@ -131,8 +131,8 @@ class DocumentStatus(models.Model):
 class Candidate(models.Model):
     candidate_id = models.CharField(max_length=10, unique=True, editable=False, primary_key=True)
     candidate_name = models.CharField(max_length=255)
-    job_id = models.CharField(max_length=10)
-    client_id = models.CharField(max_length=10)
+    job_id = models.CharField(max_length=10, blank=True, null=True)
+    client_id = models.CharField(max_length=10, blank=True, null=True)
     role = models.CharField(max_length=100)
     location = models.CharField(max_length=100)
     selection_status = models.CharField(max_length=50, choices=[('Applied', 'Applied'), ('Shortlisted', 'Shortlisted'),
@@ -140,7 +140,7 @@ class Candidate(models.Model):
                                                                    ('Hired', 'Hired'),( 'Rejected', 'Rejected')])
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15)
-    cv_file_name = models.CharField(max_length=15)
+    cv_file_name = models.CharField(max_length=255)
     creation_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
 
