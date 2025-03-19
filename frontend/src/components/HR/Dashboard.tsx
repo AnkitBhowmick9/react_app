@@ -37,7 +37,7 @@ const DashboardPage: React.FC = () => {
     <div className="dashboard-container">
       {/* Navigation Bar */}
       <div className="top-nav">
-        <h1>TechCorp Dashboard</h1>
+        <h1>HR Track Solution Dashboard</h1>
         <div className="nav-buttons">
           <button onClick={() => navigate("/hr")}>HR</button>
           <button onClick={() => navigate("/client-page", { state: { username, client_id, usertype } })}>Client Jobs</button>
@@ -90,9 +90,9 @@ const DashboardPage: React.FC = () => {
 
       {/* About TechCorp */}
       <div className="about-section">
-        <h2>About TechCorp</h2>
+        <h2>About HR Track Solution</h2>
         <p>
-          TechCorp is a cutting-edge platform where HR professionals and clients collaborate seamlessly. 
+          HR Track Solution pvt. ltd is a cutting-edge platform where HR professionals and clients collaborate seamlessly. 
           Clients post their hiring requirements, and HR finds the best candidates to match the job roles. 
           The platform streamlines the entire hiring process, making recruitment efficient and data-driven.
         </p>
@@ -101,9 +101,9 @@ const DashboardPage: React.FC = () => {
       {/* Contact Section */}
       <div className="contact-section">
         <h2>Contact Us</h2>
-        <p>Email: support@techcorp.com</p>
-        <p>Phone: +1-800-TECHCORP</p>
-        <p>Address: 123 TechCorp Avenue, New York, NY</p>
+        <p>Email: support@hrtrack.com</p>
+        <p>Phone: +1-800-787878</p>
+        <p>Address: 123 Avenue, Bengaluru, India</p>
       </div>
     </div>
   );

@@ -160,17 +160,32 @@ def get_status(request, job_id):
     })
 
 @csrf_exempt
-def update_status(request):
+def updates_status(request, job_id):
     if request.method == "POST":
+
         data = json.loads(request.body)
-        job_id = data.get("job_id")
+        # job_id = data.get("job_id")
         stage_status = data.get("stage_status")
+        if not stage_status:
+                return JsonResponse({"error": "Missing status field"}, status=400)
+        print(stage_status)
+        try:
+            job = JobStatus.objects.get(job_id=job_id)
+            job.stage_status = stage_status
+            job.save()
+            return JsonResponse({"message": "Status updated successfully"}, status=200)
+        except JobStatus.DoesNotExist:
+            return JsonResponse({"error": "Job not found"}, status=404)
+        except Exception as e:
+            print(f"Database Error: {e}")
+            return JsonResponse({"error": "Internal Server Error"}, status=500)
 
-        status = get_object_or_404(JobStatus, job_id=job_id)
-        status.stage_status = stage_status
-        status.save()
+        # print(job_id, stage_status)
+        # status = get_object_or_404(JobStatus, job_id=job_id)
+        # status.stage_status = stage_status
+        # status.save()
 
-        return JsonResponse({"success": True, "message": "Status updated successfully!"})
+        # return JsonResponse({"success": True, "message": "Status updated successfully!"})
 
 def dashboard_data(request):
     # Count of open jobs

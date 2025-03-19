@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import item_list ,login_view, \
 success_view, save_job,job_list, get_status, \
-update_status, dashboard_data, get_clients, \
+updates_status, dashboard_data, get_clients, \
 get_users, get_candidates, get_open_jobs, register_candidate,\
 update_client_id,assign_candidate_to_job, upload_cv, download_cv,\
 get_client_ids
@@ -13,7 +13,7 @@ urlpatterns = [
     path('save-job/', save_job, name='save-job'),
     path('jobs/<str:client_id>/<str:usertype>/', job_list, name='job-list'),
     path('status/<str:job_id>/', get_status, name='get-status'),
-    path('status/update/', update_status, name='update-status'),
+    path('status/updates/<str:job_id>', updates_status, name='updates_status'), ## Not adding slash, Django automatically appends a / if your route is missing one.
     path('dashboard/', dashboard_data, name='dashboard'),
     path("get-clients/", get_clients, name="get-clients"),
     path("get_client_ids/", get_client_ids, name="get_client_ids"),
