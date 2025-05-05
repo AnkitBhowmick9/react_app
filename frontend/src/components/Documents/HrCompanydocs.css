@@ -1,0 +1,108 @@
+.hrdocs-container {
+  padding: 20px;
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f9f9ff;
+  min-height: 100vh;
+}
+
+.hrdocs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #004080;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+}
+
+.hrdocs-logo {
+  height: 50px;
+  border-radius: 8px;
+}
+
+.hrdocs-title {
+  flex: 1;
+  text-align: center;
+  font-size: 24px;
+  margin: 0;
+}
+
+.hrdocs-nav button {
+  margin-left: 10px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #004080;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.hrdocs-nav button:hover {
+  background-color: #e6f0ff;
+}
+
+.form-area {
+  margin: 20px 0;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.form-area select,
+.form-area button {
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.primary-btn {
+  background-color: #004080;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background-color: #003366;
+}
+
+.table-section {
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+th, td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background-color: #004080;
+  color: white;
+}
+
+.submit-button {
+  margin-top: 20px;
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #218838;
+}

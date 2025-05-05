@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Item , UserLogin ,OpenJob ,\
-JobStatus, ClientDetails, Candidate
+JobStatus, ClientDetails, Candidate, DocumentDetails, DocumentStatus
 from .forms import LoginForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -17,15 +17,34 @@ from django.db import connection
 from .google_drive import upload_to_drive  # Import the Google Drive upload function
 import os
 from django.db.models import F, Q
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+import io
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
 
 logger = logging.getLogger(__name__)
 UPLOAD_DIR = os.path.join("uploads")  # Define uploads directory
 
+SERVICE_ACCOUNT_FILE=r"G:\BITS\Semester4\Project_related_file\hr-platform-dissertation-d697ee293a66.json"  # Update with your service account file
+
+
+SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+
+# Google Drive folder where files will be uploaded
+FOLDER_ID = "11J6Vtt_e6cUq0-C-DfSVLQtsyb9IH5DE"
+
+# Authenticate with Google Drive API
+credentials = service_account.Credentials.from_service_account_file(
+    SERVICE_ACCOUNT_FILE, scopes=SCOPES
+)
+drive_service = build("drive", "v3", credentials=credentials)
 
 def item_list(request):
     items = Item.objects.all()
     return render(request, 'myapp/item_list.html', {'items': items})
-
 
 @csrf_exempt
 def login_view(request):
@@ -110,7 +129,7 @@ def job_list(request, client_id=None, usertype=None):
         if usertype == "Employee":
             jobs = OpenJob.objects.filter(status="Open")
         elif usertype != "Employee" and client_id:
-            jobs = OpenJob.objects.filter(client_id=client_id)  
+            jobs = OpenJob.objects.filter(client_id=client_id).filter(status="Open")  
 
         if jobs.exists():
             job_list = list(jobs.values("job_id", "role_title", "job_description", "client_id", "username"))
@@ -173,6 +192,16 @@ def updates_status(request, job_id):
             job = JobStatus.objects.get(job_id=job_id)
             job.stage_status = stage_status
             job.save()
+            
+            if stage_status.get('Hired')== 'Yes':
+                candidate_dtls = Candidate.objects.get(job_id=job_id)
+                candidate_dtls.selection_status = 'Hired'
+                candidate_dtls.save()
+
+                open_jb_dtls = OpenJob.objects.get(job_id=job_id)
+                open_jb_dtls.status = 'Close'
+                open_jb_dtls.save()
+
             return JsonResponse({"message": "Status updated successfully"}, status=200)
         except JobStatus.DoesNotExist:
             return JsonResponse({"error": "Job not found"}, status=404)
@@ -352,6 +381,9 @@ def update_client_id(request, candidate_id):
             job.candidate_id = candidate_id
             job.save()
 
+            jobStat = JobStatus.objects.get(job_id=data["job_id"])
+            jobStat.stage_status={"Application Received": "Yes", "Shortlisted": "Yes", "Interview Scheduled": None, "Client Review": None, "Offer Extended": None, "Hired": None}
+            jobStat.save()
 
             return JsonResponse({"message": "Client ID updated successfully!"}, status=200)
         except Candidate.DoesNotExist:
@@ -443,3 +475,251 @@ def download_cv(request, job_id):
     except Exception as e:
         logger.exception(f"Error downloading CV for job_id: {job_id}: {e}")
         return JsonResponse({"error": "An error occurred while processing the request."}, status=500)
+    
+@csrf_exempt  # Temporarily disable CSRF for debugging
+def save_document_status(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body.decode("utf-8"))  # Ensure decoding is correct
+            print("Received Data:", data)  # Debugging print statement
+
+            # Validate required fields
+            required_fields = ["client_id", "status", "doc_store_id"]
+            for field in required_fields:
+                if field not in data:
+                    return JsonResponse({"success": False, "error": f"Missing field: {field}"}, status=400)
+
+            # Generate new `status_id`
+            last_stat = DocumentStatus.objects.order_by('-creation_date').first()
+            if last_stat and last_stat.status_id.startswith("stat_"):
+                last_number = int(last_stat.status_id.split("_")[1])  
+                new_stat_id = f"stat_{last_number + 1}"  
+            else:
+                new_stat_id = "stat_1"
+            
+            doc_id = DocumentDetails.objects.get(document_type=data["document_id"])
+            print(doc_id)
+            
+
+            # Create a new document status record
+            doc_status = DocumentStatus.objects.create(
+                status_id=new_stat_id,
+                client_id=data["client_id"],
+                document_id=doc_id,
+                candidate_id=data.get("candidate_id", None),  # Ensure candidate_id can be null
+                status=data["status"],
+                doc_store_id=data["doc_store_id"],
+            )
+
+            print(f"Created DocumentStatus: {doc_status.status_id}")  # Debugging print
+
+            return JsonResponse({"success": True, "status_id": new_stat_id})
+
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Invalid JSON format"}, status=400)
+        except Exception as e:
+            print("Error:", str(e))  # Debugging print
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
+
+@csrf_exempt
+def get_client_documents(request, client_id):
+    if request.method == "GET":
+        print("client_id:", client_id)
+        docs = list(
+            DocumentStatus.objects.filter(client_id=client_id and document_id != 'doc_1')
+            .values("status_id", "document_id", "status", "doc_store_id")
+        )
+        print("Fetched from DB:", docs)  # 👈 Add this line to confirm DB results
+        return JsonResponse({"documents": docs}, safe=False)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+@csrf_exempt
+def replace_signed_document(request):
+    if request.method == "POST":
+        file = request.FILES.get("file")
+        old_file_id = request.POST.get("old_doc_store_id")
+
+        if not file or not old_file_id:
+            return JsonResponse({"success": False, "error": "Missing data"}, status=400)
+
+        try:
+            # 1. Delete old file
+            drive_service.files().delete(fileId=old_file_id).execute()
+
+            # 2. Upload new file
+            file_metadata = {"name": file.name, "parents": [FOLDER_ID]}
+            media = MediaIoBaseUpload(io.BytesIO(file.read()), mimetype=file.content_type)
+            uploaded_file = drive_service.files().create(
+                body=file_metadata,
+                media_body=media,
+                fields="id"
+            ).execute()
+
+            new_file_id = uploaded_file.get("id")
+            # new_file_id = upload_to_drive(FOLDER_ID, file.name)
+
+            # 3. Update your DB
+            DocumentStatus.objects.filter(doc_store_id=old_file_id).update(
+                doc_store_id=new_file_id,
+                status="Approved"
+            )
+
+            return JsonResponse({"success": True, "file_id": new_file_id})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+@api_view(['GET'])
+def get_document_status(request):
+    client_id = request.GET.get('client_id')
+    if not client_id:
+        return Response({'error': 'Missing client_id'}, status=400)
+
+    try:
+        documents = DocumentStatus.objects.filter(client_id=client_id).filter(candidate_id__isnull=True)
+
+        data = []
+        for doc in documents:
+            # Fetch candidate by candidate_id
+            client = ClientDetails.objects.get(client_id=doc.client_id)
+            jb = DocumentDetails.objects.get(document_id=doc.document_id)
+            
+            # Add the document details and related candidate data
+            data.append({
+                'document_id': doc.document_id,
+                'document_name': jb.document_type,
+                'status': doc.status,
+                'Client_name': client.client_name,  # Fetch candidate name from Candidate model
+                'Client_status': client.status  # Fetch job status from Candidate model
+            })
+
+
+        # data = [{
+        #     'document_id': doc.document_id,
+        #     'status': doc.status
+        # } for doc in documents]
+        return Response(data)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+    
+@api_view(['GET'])
+def get_document_status_candidate(request):
+    try:
+        # Retrieve all DocumentStatus records where candidate_id is not null
+        documents = DocumentStatus.objects.filter(candidate_id__isnull=False)
+        
+        data = []
+        for doc in documents:
+            # Fetch candidate by candidate_id
+            candidate = Candidate.objects.get(candidate_id=doc.candidate_id)
+            jb = DocumentDetails.objects.get(document_id=doc.document_id)
+            
+            # Add the document details and related candidate data
+            data.append({
+                'document_id': doc.document_id,
+                'document_name': jb.document_type,
+                'status': doc.status,
+                'candidate_name': candidate.candidate_name,  # Fetch candidate name from Candidate model
+                'job_status': candidate.selection_status  # Fetch job status from Candidate model
+            })
+        
+        return Response(data)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+def get_hired_candidates(request):
+    try:
+        documents = Candidate.objects.filter(selection_status='Hired')
+        data = []
+
+        for doc in documents:
+            data.append({
+                'candidate_id': doc.candidate_id,
+                'candidate_name': doc.candidate_name,
+                'client_id': doc.client_id if doc.client_id else None,
+                'job_id': doc.job_id 
+            })
+
+        return Response(data)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+@api_view(['POST'])
+def get_upload_contract(request):
+    try:
+        candidate_id = request.POST.get('candidate_id')
+        client_id = request.POST.get('client_id')
+        job_id = request.POST.get('job_id')
+        file = request.FILES.get('file')
+        if not candidate_id or not file:
+            return Response({'success': False, 'message': 'Missing candidate_id or file'}, status=400)
+
+        print(file, client_id, candidate_id, job_id)
+        file_name = file.name
+
+        # Ensure "uploads" directory exists
+        if not os.path.exists(UPLOAD_DIR):
+            os.makedirs(UPLOAD_DIR)  # Create directory if not exists
+
+        file_path = os.path.join(UPLOAD_DIR, file_name)
+
+        # Save file temporarily
+        with default_storage.open(file_path, "wb+") as destination:
+            for chunk in file.chunks():
+                destination.write(chunk)
+
+        logger.info(f"File {file_name} saved locally at {file_path}")
+
+        # Upload to Google Drive
+        drive_file_id = upload_to_drive(file_path, file_name)
+        logger.info(f"File {file_name} uploaded to Google Drive with ID {drive_file_id}")
+
+        # Save document status record
+        # Generate new `status_id`
+        last_stat = DocumentStatus.objects.order_by('-creation_date').first()
+        if last_stat and last_stat.status_id.startswith("stat_"):
+            last_number = int(last_stat.status_id.split("_")[1])  
+            new_stat_id = f"stat_{last_number + 1}"  
+        else:
+            new_stat_id = "stat_1"
+
+        # Save to DocumentStatus:
+        DocumentStatus.objects.create(
+            status_id=new_stat_id,
+            candidate_id=candidate_id,
+            client_id=client_id,
+            document_id='doc_1',
+            doc_store_id=drive_file_id,
+            status='Pending'
+        )
+
+         # Clean up local storage
+        os.remove(file_path)
+
+        return Response({'success': True, 'file_id': drive_file_id})
+    except Exception as e:
+        return Response({'success': False, 'error': str(e)}, status=500)
+
+@api_view(['GET'])
+def get_candidate_contracts(request):
+    client_id = request.GET.get('client_id')
+    print("Client ID received:", client_id)
+
+    try:
+        candidates = DocumentStatus.objects.filter(candidate_id=client_id).values(
+            'status_id', 'document_id', 'doc_store_id', 'status'
+        )
+        print("Candidates found:", candidates)
+        return Response({"candidates": list(candidates)}, status=200)
+
+    except Exception as e:
+        print("Error fetching candidates:", str(e))
+        import traceback
+        traceback.print_exc()
+        return Response({"error": "Server error"}, status=500)
+    

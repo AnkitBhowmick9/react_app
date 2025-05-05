@@ -1,0 +1,191 @@
+/* General Layout */
+.page-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8fafc;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Header */
+  .header {
+    background-color: #2563eb;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .logo-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 9999px;
+  }
+  
+  .header h1 {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  
+  .logout-btn {
+    background-color: white;
+    color: #2563eb;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .logout-btn:hover {
+    background-color: #e0ecff;
+  }
+  
+  /* Navigation */
+  .navbar {
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .navbar button {
+    background: none;
+    color: #2563eb;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .navbar button:hover {
+    text-decoration: underline;
+  }
+  
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    padding: 2rem;
+  }
+  
+  .main-content h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Candidate Form */
+  .candidate-card {
+    background-color: white;
+    border: 1px solid #bfdbfe;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .candidate-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-bottom: 1rem;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    color: #1e3a8a;
+    margin-bottom: 1rem;
+  }
+  
+  .form-grid label {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  input,
+  select {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #d1d5db; /* light gray border */
+    background-color: #ffffff; /* pure white background */
+    color: #1e3a8a; /* dark blue text */
+    font-size: 1rem;
+    appearance: none; /* removes default arrow */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%231e3a8a'%20d='M2%200L0%202h4L2%200zM2%205l2-2H0l2%202z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 0.65rem auto;
+  }
+
+  /* dropdown options */
+  option {
+    background-color: #ffffff;
+    color: #1e3a8a;
+    padding: 0.5rem;
+  }
+
+  /* hover on options (some browsers support this) */
+  option:hover {
+    background-color: #eff6ff; /* very light blue */
+  }
+
+  /* when select is focused */
+  select:focus {
+    outline: none;
+    border-color: #3b82f6; /* blue-500 */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  }
+  
+  .update-btn {
+    background-color: #2563eb;
+    color: rgb(107, 5, 5);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .update-btn:hover {
+    background-color: #1d4ed8;
+  }
+  
+  /* Footer */
+  .footer {
+    background-color: #dbeafe;
+    padding: 2rem;
+    color: #1e3a8a;
+  }
+  
+  .footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .footer h4 {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .footer p {
+    margin: 0.2rem 0;
+  }
+  
+  .footer-bottom {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.875rem;
+  }
+  
