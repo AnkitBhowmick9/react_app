@@ -82,6 +82,9 @@ class ClientDetails(models.Model):
 class DocumentDetails(models.Model):
     document_id = models.CharField(max_length=10, unique=True, editable=False, primary_key=True)
     document_type = models.CharField(max_length=255)
+    creator = models.CharField(max_length=255)
+    receiver = models.CharField(max_length=255)
+
     creation_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
 
@@ -106,8 +109,9 @@ class DocumentStatus(models.Model):
     status_id = models.CharField(max_length=10, unique=True, editable=False, primary_key=True)
     client_id = models.CharField(max_length=10)
     document_id = models.CharField(max_length=10)
-    candidate_id = models.CharField(max_length=10)
-    status = models.CharField(max_length=50, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')])
+    candidate_id = models.CharField(max_length=10, null=True, blank=True)
+    status = models.CharField(max_length=50, choices=[('Not Started', 'Not Started'),('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')])
+    doc_store_id = models.CharField(max_length=255)
     creation_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
 

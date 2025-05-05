@@ -1,0 +1,54 @@
+.document-sign-container {
+  padding: 30px;
+  font-family: "Segoe UI", sans-serif;
+  background: #f9f9f9;
+  color: #333;
+  max-width: 900px;
+  margin: auto;
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #005aa7;
+}
+
+.doc-list {
+  margin-bottom: 30px;
+}
+
+.doc-row {
+  background: #fff;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.doc-name {
+  font-weight: bold;
+}
+
+.doc-status {
+  font-size: 14px;
+  color: #888;
+}
+
+.view-btn, .upload-btn, .download-btn {
+  padding: 8px 14px;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.upload-section {
+  background: #ffffff;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}

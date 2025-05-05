@@ -11,6 +11,12 @@ import CandidateForm from './components/Candidate/CandidatePage';
 import RequirementPage from './components/Requirement/RequirementPg'
 import Status from './components/Requirement/StatusPg';
 import ConfirmationPage from './components/Client/ConfirmationPage';
+import CandidateDocumentUpload from './components/Documents/CtCandidateDocumentUpload';
+import ClientDocumentSignPage from './components/Documents/client_docs';
+import Companydocs from './components/Documents/company_docs';
+
+import HrCompanydocs from './components/Documents/HrCompanydocs';
+import CandidateContractUploadPage from './components/Candidate/CandidateSignedPage';
 
 
 function App() {
@@ -31,6 +37,8 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/hr-dashboard" element={<DashboardPage />} />
+        <Route path="/hr-company-docs" element={<HrCompanydocs />} />/* Protected route */
+
 
         <Route path="/candidates-submitted" element={<CandidateSubmittedPage />} />
         
@@ -39,6 +47,14 @@ function App() {
         <Route path="/requirements-page" element={<RequirementPage />} />/* Protected route */
         <Route path="/status-page/:jobId/:client_id/:usertype" element={<Status />} />/* Protected route */
         <Route path="/confirm-page" element={<ConfirmationPage />} />/* Protected route */
+
+        <Route path="/candidate-documents" element={<CandidateDocumentUpload />} />/* Protected route */
+        <Route path="/client-docs" element={<ClientDocumentSignPage />} />/* Protected route */
+        <Route path="/company-docs" element={<Companydocs />} />/* Protected route */
+
+        <Route path="/upload-signed-contract-document" element={<CandidateContractUploadPage />} />/* Protected route */
+
+
 
 
         {/* Add more routes as needed */}

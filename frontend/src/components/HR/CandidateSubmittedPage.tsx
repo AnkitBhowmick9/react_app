@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "./CandidateSubmittedPage.css";
+import logo from "../Client/HR_track_Logo_Cropped.jpg";
 
 interface Candidate {
   candidate_id: string;
@@ -16,7 +18,7 @@ interface Candidate {
 
 interface OpenJob {
   job_id: string;
-  job_title: string;
+  role_title: string;
 }
 
 interface Client {
@@ -29,177 +31,165 @@ const CandidateSubmittedPage: React.FC = () => {
   const [openJobs, setOpenJobs] = useState<OpenJob[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<{ [key: string]: string }>({});
-  const [selectedCandidateId, setSelectedCandidateId] = useState<string>("");
-  const [selectedJobId, setSelectedJobId] = useState<string>("");
+  const [selectedJobIds, setSelectedJobIds] = useState<{ [key: string]: string }>({});
 
   const navigate = useNavigate();
 
-  // Fetch candidates, open jobs, and clients from API
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/candidates/")
-      .then(response => setCandidates(response.data))
-      .catch(error => console.error("Error fetching candidates:", error));
-
-    axios.get("http://127.0.0.1:8000/open-jobs/")
-      .then(response => setOpenJobs(response.data))
-      .catch(error => console.error("Error fetching open jobs:", error));
-
-    axios.get("http://127.0.0.1:8000/get_client_ids/")
-    .then(response => {
-      if (Array.isArray(response.data.clients)) {
-        setClients(response.data.clients);  // Ensure data is extracted correctly
-      } else {
-        console.error("Unexpected response structure:", response.data);
-      }
-     })
-    .catch(error => console.error("Error fetching clients:", error));
+    axios.get("http://127.0.0.1:8000/candidates/").then((res) => setCandidates(res.data));
+    axios.get("http://127.0.0.1:8000/open-jobs/").then((res) => setOpenJobs(res.data));
+    axios.get("http://127.0.0.1:8000/get_client_ids/").then((res) => {
+      if (Array.isArray(res.data.clients)) setClients(res.data.clients);
+    });
   }, []);
 
-  // Update Client ID for a Candidate
   const updateClientId = (candidate_id: string) => {
     const newClientId = selectedClient[candidate_id];
-    const newJobId = selectedJobId;
+    const selectedJobId = selectedJobIds[candidate_id]; // Get the specific candidate's jobId
 
-    if (!newClientId) {
-      alert("Please select a client.");
+    if (!newClientId || !selectedJobId) {
+      alert("Please select both a client and a job.");
       return;
     }
 
-    axios.put(`http://127.0.0.1:8000/candidate/${candidate_id}/update-client/`, { client_id: newClientId, job_id: newJobId })
+    axios
+      .put(`http://127.0.0.1:8000/candidate/${candidate_id}/update-client/`, {
+        client_id: newClientId,
+        job_id: selectedJobId,
+      })
       .then(() => {
-        alert("Client ID updated successfully!");
-        setCandidates(prev =>
-          prev.map(c => c.candidate_id === candidate_id ? { ...c, client_id: newClientId, job_id: newJobId } : c)
+        alert("Client and Job updated successfully!");
+        setCandidates((prev) =>
+          prev.map((c) =>
+            c.candidate_id === candidate_id
+              ? { ...c, client_id: newClientId, job_id: selectedJobId }
+              : c
+          )
         );
       })
-      .catch(error => console.error("Error updating client ID:", error));
+      .catch((error) => console.error("Error updating:", error));
   };
 
-  // // Assign Candidate to an Open Job
-  // const assignCandidateToJob = () => {
-  //   if (!selectedCandidateId || !selectedJobId) {
-  //     alert("Please select a candidate and job.");
-  //     return;
-  //   }
-
-  //   axios.put(`http://127.0.0.1:8000/open-jobs/${selectedJobId}/assign-candidate/`, { candidate_id: selectedCandidateId })
-  //     .then(() => {
-  //       alert("Candidate assigned to job successfully!");
-  //       setSelectedCandidateId("");
-  //       setSelectedJobId("");
-  //     })
-  //     .catch(error => console.error("Error assigning candidate:", error));
-  // };
-
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Candidate Submitted Page</h1>
+    <div className="page-container">
+      {/* Header */}
+      <header className="header">
+        <div className="logo-container">
+          <img src={logo} alt="Logo" className="logo-img" />
+          <h1>HR Track Solution</h1>
+        </div>
+        <button className="logout-btn" onClick={() => navigate("/")}>
+          Logout
+        </button>
+      </header>
 
-      {/* Candidate List Table */}
-      <table className="w-full border-collapse border border-gray-300 rounded-lg shadow-lg">
-        <thead className="bg-blue-500 text-white">
-          <tr>
-            <th className="p-3">Candidate ID</th>
-            <th className="p-3">Name</th>
-            <th className="p-3">Role</th>
-            <th className="p-3">Location</th>
-            <th className="p-3">Selection Status</th>
-            <th className="p-3">Client ID</th>
-            <th className="p-3">Update Client ID</th>
-          </tr>
-        </thead>
-        <tbody>
-          {candidates.map(candidate => (
-            <tr key={candidate.candidate_id} className="border-b hover:bg-gray-100">
-              <td className="p-3">{candidate.candidate_id}</td>
-              <td className="p-3">{candidate.candidate_name}</td>
-              <td className="p-3">{candidate.role}</td>
-              <td className="p-3">{candidate.location}</td>
-              <td className="p-3">{candidate.selection_status}</td>
-              <td className="p-3">{candidate.client_id}</td>
-              <td className="p-3">
-              <select
-                  className="border p-2 rounded"
+      {/* Navigation */}
+      <nav className="navbar">
+        <button onClick={() => navigate("/hr-dashboard")}>Back to Dashboard</button>
+        <button onClick={() => navigate("/candidate-documents")}>Candidate Documents</button>
+        <button onClick={() => scrollTo("about")}>About Us</button>
+        <button onClick={() => scrollTo("contact")}>Contact Us</button>
+      </nav>
+
+      {/* Main Content */}
+      <main className="main-content">
+        <h2>Update Candidate Info</h2>
+
+        {candidates.map((candidate) => (
+          <div key={candidate.candidate_id} className="candidate-card">
+            <h3>
+              {candidate.candidate_name} ({candidate.candidate_id})
+            </h3>
+
+            <div className="form-grid">
+              <div>
+                <label>Role</label>
+                <input value={candidate.role} disabled />
+              </div>
+              <div>
+                <label>Location</label>
+                <input value={candidate.location} disabled />
+              </div>
+              <div>
+                <label>Client</label>
+                <select
                   value={selectedClient[candidate.candidate_id] || ""}
-                  onChange={(e) => setSelectedClient(prev => ({ ...prev, [candidate.candidate_id]: e.target.value }))}
+                  onChange={(e) =>
+                    setSelectedClient((prev) => ({
+                      ...prev,
+                      [candidate.candidate_id]: e.target.value,
+                    }))
+                  }
                 >
                   <option value="">Select Client</option>
-                  {clients.map(client => (
+                  {clients.map((client) => (
                     <option key={client.client_id} value={client.client_id}>
-                      {client.client_name} ({client.client_id})
+                      {client.client_name}
                     </option>
                   ))}
                 </select>
-                <td className="p-3">{candidate.job_id}</td>
+              </div>
+              <div>
+                <label>Job</label>
                 <select
-                  className="border p-2 rounded"
-                  onChange={(e) => setSelectedJobId(e.target.value)}
-                  value={selectedJobId}
+                  value={selectedJobIds[candidate.candidate_id] || ""}
+                  onChange={(e) =>
+                    setSelectedJobIds((prev) => ({
+                      ...prev,
+                      [candidate.candidate_id]: e.target.value,
+                    }))
+                  }
                 >
                   <option value="">Select Job</option>
-                  {openJobs.map(job => (
+                  {openJobs.map((job) => (
                     <option key={job.job_id} value={job.job_id}>
-                      {job.job_title} ({job.job_id})
+                      {job.role_title+','+job.job_id}
                     </option>
                   ))}
                 </select>
-                <button
-                  onClick={() => updateClientId(candidate.candidate_id)}
-                  className="ml-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                >
-                  Update
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+            </div>
 
-      {/* Assign Candidate to Open Job
-      <h2 className="text-xl font-bold mt-6">Assign Candidate to Open Job</h2>
-      <div className="flex items-center gap-4 mt-4">
-        <select
-          className="border p-2 rounded"
-          onChange={(e) => setSelectedCandidateId(e.target.value)}
-          value={selectedCandidateId}
-        >
-          <option value="">Select Candidate</option>
-          {candidates.map(candidate => (
-            <option key={candidate.candidate_id} value={candidate.candidate_id}>
-              {candidate.candidate_name} ({candidate.candidate_id})
-            </option>
-          ))}
-        </select>
+            <button
+              className="update-btn"
+              onClick={() => updateClientId(candidate.candidate_id)}
+            >
+              Update
+            </button>
+          </div>
+        ))}
+      </main>
 
-        <select
-          className="border p-2 rounded"
-          onChange={(e) => setSelectedJobId(e.target.value)}
-          value={selectedJobId}
-        >
-          <option value="">Select Job</option>
-          {openJobs.map(job => (
-            <option key={job.job_id} value={job.job_id}>
-              {job.job_title} ({job.job_id})
-            </option>
-          ))}
-        </select>
-
-        <button
-          onClick={assignCandidateToJob}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Assign Candidate to Job
-        </button>
-      </div> */}
-
-      <button
-        onClick={() => navigate("/hr-dashboard")}
-        className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-      >
-        Back to Dashboard
-      </button>
+      {/* Footer */}
+      <footer className="footer">
+        <div className="footer-content">
+          <div id="about">
+            <h4>About Us</h4>
+            <p>
+              HR Track Solution streamlines hiring and candidate tracking.
+            </p>
+            <p>
+              Empowering HR professionals to manage recruitment efficiently.
+            </p>
+          </div>
+          <div id="contact">
+            <h4>Contact Us</h4>
+            <p>Email: support@hrtrack.com</p>
+            <p>Phone: +1 234 567 890</p>
+            <p>Address: 123 HR Street, TechCity, TX</p>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          &copy; 2025 HR Track Solution. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 };
 
 export default CandidateSubmittedPage;
+
+function scrollTo(id: string) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth" });
+}

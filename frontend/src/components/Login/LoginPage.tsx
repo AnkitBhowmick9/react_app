@@ -1,8 +1,8 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
-import axios, { AxiosError } from 'axios';
+import React, { useState, FormEvent } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import hrLogo from './hr_logo.jpg';
+// import hrLogo from './rrms_login.jpg';
+import hrLogo from '../Client/HR_track_Logo.jpg';
 import './LoginPage.css';
 
 interface LoginResponse {
@@ -10,7 +10,7 @@ interface LoginResponse {
   user_id: number;
   username: string;
   usertype: string;
-  client_id?: string; // Only applicable for clients
+  client_id?: string;
 }
 
 function LoginPage() {
@@ -21,7 +21,7 @@ function LoginPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError(null); // Reset error before making a request
+    setError(null);
 
     try {
       const response = await axios.post<LoginResponse>('http://127.0.0.1:8000/login/', {
@@ -29,10 +29,8 @@ function LoginPage() {
         password,
       });
 
-      const { usertype, client_id } = response.data; // Extracting user type and client_id
+      const { usertype, client_id } = response.data;
 
-      console.log(usertype)
-      // Redirect based on user type
       if (usertype === 'Employee') {
         navigate('/hr-dashboard', { state: { username, usertype, client_id } });
       } else if (usertype === 'Client') {
@@ -48,9 +46,9 @@ function LoginPage() {
   };
 
   return (
-    <div className="login-container" style={{ backgroundImage: `url(${hrLogo})` }}>
-      <div className="login-form">
-        <h1>Login</h1>
+    <div className="login-wrapper" style={{ backgroundImage: `url(${hrLogo})` }}>
+      <div className="login-glass">
+        <h2>Welcome to HR Track</h2>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -69,6 +67,7 @@ function LoginPage() {
           {error && <p className="error-message">{error}</p>}
           <button type="submit">Login</button>
         </form>
+        <p className="login-footer">© 2025 HR Track Solution</p>
       </div>
     </div>
   );

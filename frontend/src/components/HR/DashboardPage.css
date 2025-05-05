@@ -1,0 +1,143 @@
+/* DashboardPage.css */
+
+.dashboard-wrapper {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f9fafb;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .header {
+    background-color: #2563eb;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 9999px;
+  }
+  
+  .app-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .logout-btn {
+    background-color: white;
+    color: #2563eb;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .logout-btn:hover {
+    background-color: #e0e7ff;
+  }
+  
+  .nav-bar {
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .nav-bar button {
+    color: #2563eb;
+    background: none;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .nav-bar button:hover {
+    text-decoration: underline;
+  }
+  
+  .dashboard-main {
+    padding: 2rem;
+    display: grid;
+    gap: 2rem;
+    max-width: 900px;
+    margin: auto;
+  }
+  
+  .card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #d1d5db;
+  }
+  
+  .card.highlight {
+    border-left-color: #2563eb;
+  }
+  
+  .card h2 {
+    font-size: 1.25rem;
+    color: #1e3a8a;
+    margin-bottom: 1rem;
+  }
+  
+  .status-list li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .count {
+    font-size: 2.5rem;
+    color: #2563eb;
+    font-weight: bold;
+  }
+  
+  .footer {
+    background-color: #e0f2fe;
+    padding: 2rem;
+    margin-top: 2rem;
+    color: #1e40af;
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  
+  .footer h3 {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .loading {
+    text-align: center;
+    margin-top: 4rem;
+    font-size: 1.25rem;
+    color: #2563eb;
+  }
+  
+  @media (max-width: 768px) {
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .dashboard-main {
+      padding: 1rem;
+    }
+  }
+  

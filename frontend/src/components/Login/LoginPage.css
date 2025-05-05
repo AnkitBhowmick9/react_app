@@ -1,45 +1,86 @@
 /* LoginPage.css */
-.login-container {
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    min-height: 100vh; /* Ensure full viewport height */
-    /* background-image: url(./components/hr_logo.jpg); Replace with your image URL */
-    background-size: cover; /* Cover the entire background */
-    background-repeat: no-repeat; /* Prevent image tiling */
+
+.login-wrapper {
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(2px);
+}
+
+.login-glass {
+  background: rgba(255, 255, 255, 0.85);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  animation: slideIn 0.5s ease-out;
+}
+
+.login-glass h2 {
+  margin-bottom: 20px;
+  color: #1e3a8a;
+  font-weight: bold;
+}
+
+.login-glass form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.login-glass input {
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.login-glass input:focus {
+  border-color: #2563eb;
+  outline: none;
+}
+
+.login-glass button {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background-color: #2563eb;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-glass button:hover {
+  background-color: #1e40af;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9rem;
+}
+
+.login-footer {
+  margin-top: 20px;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
   }
-  
-  .login-form {
-    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
-    text-align: center; /* Center text within the form */
+  to {
+    transform: translateY(0px);
+    opacity: 1;
   }
-  
-  .login-form h1 {
-    margin-bottom: 20px;
-  }
-  
-  .login-form input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box; /* Include padding in width */
-  }
-  
-  .login-form button {
-    background-color: #007bff; /* Blue button */
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .error-message {
-    color: red;
-    margin-top: 10px;
-  }
+}
